@@ -3,9 +3,23 @@ from bs4 import BeautifulSoup
 
 url = "https://webscraper.io/test-sites/e-commerce/static/computers/laptops"
 
-def get_html(url): # gets url and parses html
-    page = requests.get(url)
-    return BeautifulSoup(page.text, "html.parser")
+def get_html(url): # checks if url is valid or can be scraped, also parses html 
+    try:
+        page = requests.get(url, timeout=10)
+        page.raise_for_status()
+        return BeautifulSoup(page.text, "html.parser")
+    except requests.exceptions.MissingSchema:
+        print("Invalid URL. Make sure it starts with http:// or https://")
+        exit()
+    except requests.exceptions.ConnectionError:
+        print("Could not connect. Check your internet or the URL.")
+        exit()
+    except requests.exceptions.HTTPError:
+        print(f"HTTP error: {page.status_code}")
+        exit()
+    except requests.exceptions.Timeout:
+        print("Request timed out.")
+        exit()
 
 def get_name(card): # parses through html to print out laptop name
     try:
