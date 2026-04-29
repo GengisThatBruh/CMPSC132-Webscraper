@@ -7,6 +7,12 @@ def get_html(url): # gets url and parses html
     page = requests.get(url)
     return BeautifulSoup(page.text, "html.parser")
 
+def get_name(card): # parses through html to print out laptop name
+    try:
+        return " ".join(card.find("a", class_="title").text.split())
+    except AttributeError:
+        return "N/A"
+
 
 
 
