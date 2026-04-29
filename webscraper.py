@@ -25,6 +25,22 @@ def display(name, price, rating): # print formatted strings from previous return
     print(f"Rating: {rating}")
     print("-" * 30) 
 
+def scrape_laptops(url): # appends all laptops into a list, calls get functions
+    htmlparsed = get_html(url)
+    cards = htmlparsed.find_all("div", class_="card-body")
+    laptops = []
+    for card in cards:
+        name = get_name(card)
+        price = get_price(card)
+        laptops.append({"name": name, "price": price})
+    return laptops
+
+
+url = input("Enter URL: ")
+laptops = scrape_laptops(url) # calls display for each laptop in list
+for laptop in laptops:
+    display(laptop["name"], laptop["price"], laptop["rating"])
+
 
 
 
