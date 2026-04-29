@@ -13,6 +13,11 @@ def get_name(card): # parses through html to print out laptop name
     except AttributeError:
         return "N/A"
 
+def get_price(card): # parses through html to print out price
+    try:
+        return card.find("span", itemprop="price").text.strip()
+    except AttributeError:
+        return "N/A"
 
 
 
