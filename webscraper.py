@@ -1,60 +1,53 @@
 import requests
 from bs4 import BeautifulSoup
 
-url = "https://webscraper.io/test-sites/e-commerce/static/computers/laptops"
+# Step 1: Send request and parse HTML
+def get_html(url):
+    page = requests.get(url)
+    return BeautifulSoup(page.text, "html.parser")
 
-def get_html(url): # checks if url is valid or can be scraped, also parses html 
-    try:
-        page = requests.get(url, timeout=10)
-        page.raise_for_status()
-        return BeautifulSoup(page.text, "html.parser")
-    except requests.exceptions.MissingSchema:
-        print("Invalid URL. Make sure it starts with http:// or https://")
-        exit()
-    except requests.exceptions.ConnectionError:
-        print("Could not connect. Check your internet or the URL.")
-        exit()
-    except requests.exceptions.HTTPError:
-        print(f"HTTP error: {page.status_code}")
-        exit()
-    except requests.exceptions.Timeout:
-        print("Request timed out.")
-        exit()
-
-def get_name(card): # parses through html to print out laptop name
+# Step 2: Extract laptop name
+def get_name(card):
     try:
         return " ".join(card.find("a", class_="title").text.split())
     except AttributeError:
         return "N/A"
 
-def get_price(card): # parses through html to print out price
+# Step 3: Extract laptop price
+def get_price(card):
     try:
         return card.find("span", itemprop="price").text.strip()
     except AttributeError:
         return "N/A"
-    
-def display(name, price, rating): # print formatted strings from previous returns
+
+# Step 4: Extract laptop rating
+def get_rating(card):
+    try:
+        return card.find("span", class_="ratings").get("data-rating")
+    except AttributeError:
+        return "N/A"
+
+# Step 5: Display laptop info
+def display(name, price, rating):
     print(f"Laptop: {name}")
     print(f"Price: {price}")
     print(f"Rating: {rating}")
-    print("-" * 30) 
+    print("-" * 30)
 
-def scrape_laptops(url): # appends all laptops into a list, calls get functions
+# Step 6: Scrape all laptops and store in a list
+def scrape_laptops(url):
     htmlparsed = get_html(url)
     cards = htmlparsed.find_all("div", class_="card-body")
     laptops = []
     for card in cards:
         name = get_name(card)
         price = get_price(card)
-        laptops.append({"name": name, "price": price})
+        rating = get_rating(card)
+        laptops.append({"name": name, "price": price, "rating": rating})
     return laptops
 
-
+# Main
 url = input("Enter URL: ")
-laptops = scrape_laptops(url) # calls display for each laptop in list
+laptops = scrape_laptops(url)
 for laptop in laptops:
     display(laptop["name"], laptop["price"], laptop["rating"])
-
-
-
-
